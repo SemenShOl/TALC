@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "nodemon": "^3.1.7",
+    "typescript": "^5.6.3",
+    "vite-node": "^2.1.3"
+  },
+  "type": "module",
+  "name": "lr-1",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev:debug": "node --inspect-brk ./node_modules/vite-node/vite-node.mjs --w src/index.ts",
+    "dev": "vite-node --w src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
