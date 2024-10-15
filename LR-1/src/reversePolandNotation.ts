@@ -90,7 +90,6 @@ export class ReversePolandNotation {
         )
           throw new Error("Некорректное использование операторов");
         if (bracketsBalance > 0 && token === "-") {
-          debugger;
           if (
             previousToken === "(" &&
             nextToken &&
