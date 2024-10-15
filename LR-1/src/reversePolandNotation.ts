@@ -38,80 +38,80 @@ export class ReversePolandNotation {
       const nextToken = tokens[index + 1];
       if (bracketsBalance < 0) throw new Error("Лишняя закрывающаяся скобка");
 
-      if (ReversePolandNotation.getTokenType(token) === CONST.NUMBER) {
-        // Если токен - операнд, добавляем его в выходную строку
-        if (
-          previousToken &&
-          ReversePolandNotation.getTokenType(previousToken) === CONST.NUMBER
-        ) {
-          throw new Error("Некорректное использование операндов");
-        }
-
-        output.push(minusNumber + token);
-        minusNumber = "";
-      } else if (
-        ReversePolandNotation.getTokenType(token) === CONST.LEFT_BRACKET
-      ) {
-        // Если токен - открывающая скобка, помещаем его в стек
-        if (
-          previousToken &&
-          ReversePolandNotation.getTokenType(previousToken) === CONST.NUMBER
-        )
-          throw new Error("Некорректное использование скобок");
-        bracketsBalance++;
-        operators.push(token);
-      } else if (
-        ReversePolandNotation.getTokenType(token) === CONST.RIGHT_BRACKET
-      ) {
-        // Если токен - закрывающая скобка, выталкиваем операторы до открывающей скобки
-        bracketsBalance--;
-        if (
-          previousToken &&
-          ReversePolandNotation.getTokenType(previousToken) === CONST.OPERATOR
-        )
-          throw new Error("Некорректное использование скобок");
-        if (previousToken === "(") throw new Error("Пустые скобки");
-
-        while (
-          operators.length > 0 &&
-          operators[operators.length - 1] !== "("
-        ) {
-          output.push(operators.pop());
-        }
-        operators.pop(); // Удаляем открывающую скобку из стека
-      } else if (ReversePolandNotation.getTokenType(token) === CONST.OPERATOR) {
-        // Если токен - оператор
-        if (
-          previousToken &&
-          ReversePolandNotation.getTokenType(previousToken) !== CONST.NUMBER &&
-          ReversePolandNotation.getTokenType(previousToken) !==
-            CONST.RIGHT_BRACKET &&
-          token !== "-"
-        )
-          throw new Error("Некорректное использование операторов");
-        if (bracketsBalance > 0 && token === "-") {
+      switch (ReversePolandNotation.getTokenType(token)) {
+        case CONST.NUMBER:
           if (
-            previousToken === "(" &&
-            nextToken &&
-            ReversePolandNotation.getTokenType(nextToken) === CONST.NUMBER &&
-            tokens[index + 2] &&
-            tokens[index + 2] === ")"
+            previousToken &&
+            ReversePolandNotation.getTokenType(previousToken) === CONST.NUMBER
           ) {
-            minusNumber = "-";
-          } else {
-            throw new Error("Некорректное использование операторов");
+            throw new Error("Некорректное использование операндов");
           }
-        } else {
+
+          output.push(minusNumber + token);
+          minusNumber = "";
+          break;
+        case CONST.LEFT_BRACKET:
+          if (
+            previousToken &&
+            ReversePolandNotation.getTokenType(previousToken) === CONST.NUMBER
+          )
+            throw new Error("Некорректное использование скобок");
+          bracketsBalance++;
+          operators.push(token);
+          break;
+        case CONST.RIGHT_BRACKET:
+          bracketsBalance--;
+          if (
+            previousToken &&
+            ReversePolandNotation.getTokenType(previousToken) === CONST.OPERATOR
+          )
+            throw new Error("Некорректное использование скобок");
+          if (previousToken === "(") throw new Error("Пустые скобки");
+
           while (
             operators.length > 0 &&
-            ReversePolandNotation.getPriority(
-              operators[operators.length - 1]
-            ) >= ReversePolandNotation.getPriority(token)
+            operators[operators.length - 1] !== "("
           ) {
             output.push(operators.pop());
           }
-          operators.push(token);
-        }
+          operators.pop();
+          break;
+        case CONST.OPERATOR:
+          if (
+            previousToken &&
+            ReversePolandNotation.getTokenType(previousToken) !==
+              CONST.NUMBER &&
+            ReversePolandNotation.getTokenType(previousToken) !==
+              CONST.RIGHT_BRACKET &&
+            token !== "-"
+          )
+            throw new Error("Некорректное использование операторов");
+          if (bracketsBalance > 0 && token === "-") {
+            if (
+              previousToken === "(" &&
+              nextToken &&
+              ReversePolandNotation.getTokenType(nextToken) === CONST.NUMBER &&
+              tokens[index + 2] &&
+              tokens[index + 2] === ")"
+            ) {
+              minusNumber = "-";
+            } else {
+              throw new Error("Некорректное использование операторов");
+            }
+          } else {
+            while (
+              operators.length > 0 &&
+              ReversePolandNotation.getPriority(
+                operators[operators.length - 1]
+              ) >= ReversePolandNotation.getPriority(token)
+            ) {
+              output.push(operators.pop());
+            }
+            operators.push(token);
+          }
+          break;
+        default:
+          throw new Error("Некорректный символ в выражении");
       }
     });
 
