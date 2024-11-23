@@ -1,6 +1,4 @@
 const fs = require("fs");
-
-// Вспомогательная функция для проверки правил
 function findProducingRules(grammar, symbols) {
   const result = [];
   for (const [nonTerminal, productions] of Object.entries(grammar)) {
@@ -15,8 +13,36 @@ function findProducingRules(grammar, symbols) {
   }
   return result;
 }
+function parseRules(rules) {
+  const grammar = {};
 
-// CYK-алгоритм
+  rules.forEach((rule) => {
+    // Разделяем правило по "→"
+    const [left, right] = rule.split(">");
+
+    // Разделяем правую часть по "|", если таковые есть, и затем разбиваем на символы
+    const rightParts = right.split("|").map((part) => part.trim().split(""));
+
+    // Если для текущего нетерминала ещё нет записей в объекте, добавляем новый массив
+    if (!grammar[left.trim()]) {
+      grammar[left.trim()] = [];
+    }
+
+    // Добавляем все правые части в массив для текущего нетерминала
+    grammar[left.trim()].push(...rightParts);
+  });
+
+  return grammar;
+}
+
+// Пример входных данных (правила грамматики)
+// const rules = ["S>AB", "S>C", "C>SS", "A>(", "B>)"];
+
+// Вызов функции для парсинга правил
+// const grammar = parseRules(rules);
+
+// Выводим результат
+// console.log(grammar);
 function cykAlgorithm(grammar, word) {
   const n = word.length;
   const table = Array.from({ length: n }, () =>
@@ -62,39 +88,16 @@ function cykAlgorithm(grammar, word) {
   return table[0][n - 1].has("S");
 }
 
-// Пример использования
-// const grammar = {
-//   S: [["A", "A"], ["A", "S"], ["b"]],
-//   A: [["S", "A"], ["A", "S"], ["a"]],
-// };
-
-function parseRules(input) {
-  const rules = {};
-  const lines = input
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0);
-
-  lines.forEach((line) => {
-    const [key, value] = line.split(">").map((part) => part.trim());
-    const alternatives = value.split("|").map((alt) => alt.trim());
-    rules[key] = alternatives.map((alt) =>
-      alt.split("").map((symbol) => symbol.trim())
-    );
-  });
-
-  return rules;
-}
-
-fs.readFile("rules.txt", "utf-8", (err, data) => {
+fs.readFile("rules2.txt", "utf-8", (err, data) => {
   if (err) {
     console.error("Ошибка чтения файла:", err);
     return;
   }
-
-  const parsedRules = parseRules(data);
+  console.log(data);
+  const dataArr = data.split("\n");
+  const parsedRules = parseRules(dataArr);
   console.log(parsedRules);
-  const word = "S";
+  const word = "(())";
 
   if (cykAlgorithm(parsedRules, word)) {
     console.log("Слово принадлежит грамматике.");
